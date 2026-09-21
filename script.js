@@ -25,6 +25,10 @@ const letra = [
         texto: "Yo te cuidaré"
     },
     {
+        tiempo: 20,
+        texto: "Como en las pedas y todo lo demas"
+    },
+    {
         tiempo: 25,
         texto: "Corre y no vuelvas..."
     },
@@ -35,6 +39,10 @@ const letra = [
     {
         tiempo: 46,
         texto: "Vámonos de viaje..."
+    },
+   {
+        tiempo: 53,
+        texto: "Llegar a un hoter a cog*r"
     },
     {
         tiempo: 59,
