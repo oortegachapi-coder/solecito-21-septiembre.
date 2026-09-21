@@ -1,202 +1,430 @@
-const boton = document.getElementById("comenzar");
-const inicio = document.getElementById("inicio");
-const contenido = document.getElementById("contenido");
-const musica = document.getElementById("musica");
+/* =====================================================
+   ELEMENTOS
+===================================================== */
 
-const textoLetra = document.getElementById("texto-letra");
-const final = document.getElementById("final");
+const boton =
+    document.getElementById("comenzar");
+
+const inicio =
+    document.getElementById("inicio");
+
+const contenido =
+    document.getElementById("contenido");
+
+const musica =
+    document.getElementById("musica");
+
+const textoLetra =
+    document.getElementById("texto-letra");
+
+const final =
+    document.getElementById("final");
 
 
 /* =====================================================
-   SINCRONIZACIÓN
+   CONFIGURACIÓN
 ===================================================== */
 
+const TIEMPO_FINAL = 89;
+
+
+/*
+   SINCRONIZACIÓN
+
+   Los tiempos están en segundos.
+
+   Puedes colocar aquí las frases que
+   quieras mostrar.
+*/
+
 const letra = [
+
     {
         tiempo: 4,
         texto: "Vámonos de aquí"
     },
+
     {
         tiempo: 8,
-        texto: "Acompáñame"
+        texto: "acompáñame"
     },
+
     {
         tiempo: 14,
         texto: "Yo te cuidaré"
     },
+
     {
         tiempo: 20,
-        texto: "Como en las pedas y todo lo demas"
+        texto: "como en las pedas y todo lo demás"
     },
+
     {
         tiempo: 25,
-        texto: "Corre y no vuelvas..."
+        texto: "corre y no vuelvas si quieres te ayudo a escapar"
     },
+
     {
         tiempo: 36,
-        texto: "Corre, te sigo, vámonos a cualquier lugar"
+        texto: "corre, te sigo, vámonos a cualquier lugar"
     },
+
     {
         tiempo: 46,
-        texto: "Vámonos de viaje..."
+        texto: "vámonos de viaje y no volver"
     },
-   {
+
+    {
         tiempo: 53,
-        texto: "Llegar a un hoter a cog*r"
+        texto: "llegar a un hotel a coger"
     },
+
     {
         tiempo: 59,
-        texto: "No importa, vamos a estar bien"
+        texto: "no importa vamos a estar bien"
     },
+
     {
         tiempo: 67,
-        texto: "Vamos a dejar nuestra ciudad"
+        texto: "vamos a dejar nuestra ciudad"
     },
+
     {
         tiempo: 74,
-        texto: "Comprarnos ropa..."
+        texto: "comprarnos ropa de bazar"
     },
+
     {
         tiempo: 80,
-        texto: "No importa todo lo demás"
+        texto: "no importa todo lo demás"
     },
+
     {
         tiempo: 89,
-        texto: "¡Ay wey, qué felicidad!"
+        texto: "ay wey que felicidad"
     }
+
 ];
 
 
 /* =====================================================
-   INICIAR
+   VARIABLES
 ===================================================== */
 
-boton.addEventListener("click", async () => {
+let indiceActual = -1;
 
-    inicio.classList.add("oculto");
+let iniciado = false;
 
-    contenido.classList.add("visible");
+let terminado = false;
 
-    musica.volume = 0.85;
 
-    try {
+/* =====================================================
+   INICIO
+===================================================== */
 
-        await musica.play();
+boton.addEventListener(
+    "click",
+    iniciar
+);
 
-    } catch (error) {
 
-        console.log(
-            "El navegador no pudo iniciar el audio:",
-            error
+function iniciar() {
+
+    if (iniciado) {
+
+        return;
+
+    }
+
+
+    iniciado = true;
+
+
+    /*
+       Ocultar pantalla inicial
+    */
+
+    inicio.classList.add(
+        "oculto"
+    );
+
+
+    /*
+       Mostrar escena
+    */
+
+    contenido.classList.add(
+        "visible"
+    );
+
+
+    /*
+       Reiniciar música
+    */
+
+    musica.currentTime = 0;
+
+
+    /*
+       Reproducir música
+    */
+
+    const reproduccion =
+        musica.play();
+
+
+    if (
+        reproduccion !== undefined
+    ) {
+
+        reproduccion.catch(
+            function(error) {
+
+                console.log(
+                    "Error de reproducción:",
+                    error
+                );
+
+            }
         );
 
     }
 
-});
+
+    /*
+       Comenzar sincronización
+    */
+
+    requestAnimationFrame(
+        actualizar
+    );
+
+}
 
 
 /* =====================================================
-   LETRA
+   ACTUALIZAR
 ===================================================== */
 
-musica.addEventListener("timeupdate", () => {
+function actualizar() {
 
-    const tiempo = musica.currentTime;
+    if (!iniciado) {
 
-    let nuevoTexto = "";
+        return;
 
-    for (let i = 0; i < letra.length; i++) {
+    }
 
-        if (tiempo >= letra[i].tiempo) {
-            nuevoTexto = letra[i].texto;
+
+    const tiempo =
+        musica.currentTime;
+
+
+    /*
+       Comprobar final
+    */
+
+    if (
+        tiempo >=
+        TIEMPO_FINAL
+    ) {
+
+        terminar();
+
+        return;
+
+    }
+
+
+    /*
+       Buscar frase actual
+    */
+
+    let nuevoIndice = -1;
+
+
+    for (
+        let i = 0;
+        i < letra.length;
+        i++
+    ) {
+
+        if (
+            tiempo >=
+            letra[i].tiempo
+        ) {
+
+            nuevoIndice = i;
+
         }
 
     }
 
-    if (textoLetra.textContent !== nuevoTexto) {
 
-        textoLetra.style.opacity = "0";
-        textoLetra.style.transform =
-            "translateY(10px)";
-
-        setTimeout(() => {
-
-            textoLetra.textContent = nuevoTexto;
-
-            textoLetra.style.opacity = "1";
-            textoLetra.style.transform =
-                "translateY(0)";
-
-        }, 150);
-
-    }
-
-});
-
-
-/* =====================================================
-   FINAL DE LA CANCIÓN
-===================================================== */
-
-musica.addEventListener("ended", () => {
-
-    textoLetra.textContent = "";
-
-    final.classList.add("mostrar");
-
-    setTimeout(() => {
-
-        final.scrollIntoView({
-            behavior: "smooth"
-        });
-
-    }, 400);
-
-});
-
-
-/* =====================================================
-   FINAL VISUAL ANTES DEL FINAL DEL AUDIO
-===================================================== */
-
-let finalPreparado = false;
-
-musica.addEventListener("timeupdate", () => {
+    /*
+       Cambiar solamente cuando
+       aparece una nueva frase.
+    */
 
     if (
-        musica.currentTime >= 89 &&
-        !finalPreparado
+        nuevoIndice !== -1 &&
+        nuevoIndice !== indiceActual
     ) {
 
-        finalPreparado = true;
+        indiceActual =
+            nuevoIndice;
 
-        setTimeout(() => {
 
-            final.classList.add("mostrar");
-
-        }, 2500);
+        mostrarTexto(
+            letra[indiceActual].texto
+        );
 
     }
 
-});
+
+    /*
+       Continuar
+    */
+
+    requestAnimationFrame(
+        actualizar
+    );
+
+}
 
 
 /* =====================================================
-   COMPROBACIONES
+   MOSTRAR TEXTO
 ===================================================== */
 
-musica.addEventListener("canplaythrough", () => {
+function mostrarTexto(
+    texto
+) {
 
-    console.log(
-        "✓ Música cargada correctamente"
+    /*
+       Ocultar
+    */
+
+    textoLetra.classList.remove(
+        "mostrar"
     );
 
-});
 
-musica.addEventListener("error", () => {
+    /*
+       Esperar transición
+    */
 
-    console.error(
-        "✕ No se pudo cargar musica.mp3"
+    setTimeout(
+        function() {
+
+            textoLetra.textContent =
+                texto;
+
+            textoLetra.classList.add(
+                "mostrar"
+            );
+
+        },
+        250
     );
 
-});
+}
+
+
+/* =====================================================
+   FINAL
+===================================================== */
+
+function terminar() {
+
+    if (terminado) {
+
+        return;
+
+    }
+
+
+    terminado = true;
+
+
+    /*
+       Detener música
+    */
+
+    musica.pause();
+
+
+    musica.currentTime =
+        TIEMPO_FINAL;
+
+
+    /*
+       Desaparecer letra
+    */
+
+    textoLetra.classList.remove(
+        "mostrar"
+    );
+
+
+    /*
+       Mostrar pantalla final
+    */
+
+    setTimeout(
+        function() {
+
+            final.classList.add(
+                "visible"
+            );
+
+        },
+        900
+    );
+
+
+    /*
+       Detener algunas partículas
+       suavemente.
+    */
+
+    setTimeout(
+        function() {
+
+            const particulas =
+                document.querySelectorAll(
+                    ".luciernagas span"
+                );
+
+
+            particulas.forEach(
+                function(particula) {
+
+                    particula.style.animationPlayState =
+                        "paused";
+
+                }
+            );
+
+        },
+        2500
+    );
+
+}
+
+
+/* =====================================================
+   SI EL AUDIO TERMINA
+===================================================== */
+
+musica.addEventListener(
+    "ended",
+    function() {
+
+        if (!terminado) {
+
+            terminar();
+
+        }
+
+    }
+);
